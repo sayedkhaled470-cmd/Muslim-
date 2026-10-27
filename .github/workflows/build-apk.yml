@@ -46,7 +46,7 @@ jobs:
                   p=R+d+'/'+n
                   if os.path.exists(p):
                       Image.open(src).convert('RGBA').resize((s,s)).save(p)
-          open('android/app/src/main/res/values/ic_launcher_background.xml','w').write('#0b3a47')
+          open('android/app/src/main/res/values/ic_launcher_background.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#0b3a47</color>\n</resources>\n')
           PY
           R=android/app/src/main/res
           mkdir -p $R/raw $R/values-ar
