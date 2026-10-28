@@ -36,6 +36,12 @@ jobs:
               for n,s,src in [('ic_launcher.png',a,'icon.png'),('ic_launcher_round.png',a,'icon.png'),('ic_launcher_foreground.png',f,'icon-fg.png')]:
                   p=r+d+'/'+n
                   if os.path.exists(p): Image.open(src).convert('RGBA').resize((s,s)).save(p)
+          import glob
+          from PIL import ImageOps
+          sp=Image.open('splash.png').convert('RGB')
+          for q in glob.glob('android/app/src/main/res/drawable*/splash.png'):
+              w,h=Image.open(q).size
+              ImageOps.fit(sp,(w,h),Image.LANCZOS).save(q)
           open('android/app/src/main/res/values/ic_launcher_background.xml','w').write('<?xml version="1.0" encoding="utf-8"?><resources><color name="ic_launcher_background">#0b3a47</color></resources>')
           PY
           R=android/app/src/main/res
@@ -55,4 +61,3 @@ jobs:
         with:
           name: muslim-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          
