@@ -128,10 +128,10 @@ nav{position:fixed;inset:auto 0 0 0;width:min(400px,calc(100% - 16px));margin:0 
 nav button{flex:1;border:0;background:transparent;padding:9px 0 7px;border-radius:26px;color:var(--ink);font-size:9.5px;line-height:1.3;transition:background .3s,color .3s,transform .3s}
 nav svg{display:block;margin:0 auto 3px;width:21px;height:21px;stroke-width:1.6}
 nav button[aria-pressed="true"]{color:var(--ac);background:radial-gradient(ellipse at 50% 70%,var(--glow),transparent 72%),var(--fl);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75),inset 0 0 16px var(--glow);transform:scale(1.06)}
-#npx,#ppx{position:fixed;inset:0;z-index:40;background:rgba(10,4,24,.42);opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .5s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-#npx.open,#ppx.open{opacity:1;visibility:visible;transition:opacity .4s,visibility 0s}
-#np,#pp{position:fixed;top:50%;inset-inline:0;margin-inline:auto;width:min(92vw,400px);max-height:80vh;z-index:41;transform:translateY(-50%) scaleY(0);transform-origin:center;opacity:0;visibility:hidden;transition:transform .5s cubic-bezier(.2,.9,.3,1),opacity .3s,visibility 0s .5s}
-#np.open,#pp.open{transform:translateY(-50%) scaleY(1);opacity:1;visibility:visible;transition:transform .5s cubic-bezier(.2,.9,.3,1),opacity .3s,visibility 0s}
+#npx,#ppx,#sxx{position:fixed;inset:0;z-index:40;background:rgba(10,4,24,.42);opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .5s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#npx.open,#ppx.open,#sxx.open{opacity:1;visibility:visible;transition:opacity .4s,visibility 0s}
+#np,#pp,#sx{position:fixed;top:50%;inset-inline:0;margin-inline:auto;width:min(92vw,400px);max-height:80vh;z-index:41;transform:translateY(-50%) scaleY(0);transform-origin:center;opacity:0;visibility:hidden;transition:transform .5s cubic-bezier(.2,.9,.3,1),opacity .3s,visibility 0s .5s}
+#np.open,#pp.open,#sx.open{transform:translateY(-50%) scaleY(1);opacity:1;visibility:visible;transition:transform .5s cubic-bezier(.2,.9,.3,1),opacity .3s,visibility 0s}
 @keyframes pulse{50%{box-shadow:0 0 44px var(--glow),0 0 110px -6px var(--glow),inset 0 0 54px rgba(130,90,255,.2)}}
 .nph{display:flex;justify-content:space-between;align-items:center}.nph h2{margin:0;font-size:18px;font-weight:500;text-shadow:0 0 12px var(--ac)}
 #npc{width:36px;height:36px;border-radius:50%;border:1px solid var(--ac);background:transparent;font-size:22px;line-height:1;color:#fff}
@@ -250,6 +250,12 @@ html[data-fx='jewel'] .win{border-color:rgba(255,255,255,.55);background-image:l
 .exb button{flex:1;padding:14px;border:1.5px solid color-mix(in srgb,var(--ac) 40%,#fff);background:rgba(255,255,255,.06);color:#fff;border-radius:0;font-size:18px;letter-spacing:.06em}
 .exb button[data-ex="y"]{background:color-mix(in srgb,var(--ac) 30%,transparent);box-shadow:0 0 12px var(--glow)}
 .ql small.tg{color:#ffb86b;font-size:11px;white-space:nowrap}
+#sx{z-index:42}#sxx{z-index:41}
+.sxb{overflow:auto;max-height:58vh;display:flex;flex-direction:column;gap:10px}
+#sx .row,#sx .seg button,#sx .sti,#sx .nm,#sx select{color:#fff;background:rgba(255,255,255,.07);border:1.5px solid color-mix(in srgb,var(--ac) 40%,#fff);border-radius:0;box-shadow:none}
+#sx .row{margin-top:0}#sx .row b{color:#ffd37a}#sx .sl{color:#c9d6f0;margin:6px 0 0}#sx .stp b{color:#fff}#sx .stp button{color:#fff;background:rgba(255,255,255,.1)}
+#sx .seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--on);border-color:transparent}
+#sx .sti[aria-pressed="true"]{outline:2px solid var(--ac)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -257,7 +263,7 @@ html[data-fx='jewel'] .win{border-color:rgba(255,255,255,.55);background-image:l
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
 <div class="app"><section class="win" id="hd"></section><div id="v"></div></div>
 <nav id="nv"></nav>
-<div id="npx"></div><aside id="np" aria-label="الإشعارات"></aside><div id="ppx"></div><aside id="pp" aria-label="الملف الشخصي"></aside>
+<div id="npx"></div><aside id="np" aria-label="الإشعارات"></aside><div id="ppx"></div><aside id="pp" aria-label="الملف الشخصي"></aside><div id="sxx"></div><aside id="sx" aria-label="الإعدادات"></aside>
 <div id="t" aria-live="polite"><span id="tx"></span></div>
 <div id="w" hidden role="dialog" aria-modal="true"><div class="nfo"><div class="nfi"><div class="nfh"><span class="nfb">!</span><h2 class="nft" id="wt"></h2></div><div id="wb"></div><button id="ok">تأكيد</button></div></div></div>
 <div id="ex" hidden role="dialog" aria-modal="true"></div>
@@ -509,10 +515,22 @@ function playAd(){if(!S.adOn||!S.ad)return;const au=$('au');au.src='adhan/'+S.ad
 const AOK={};async function chkAd(id){if(AOK[id]!==undefined)return AOK[id];try{const r=await fetch('adhan/'+id+'.mp3',{method:'HEAD'});AOK[id]=r.ok}catch(e){AOK[id]=false}return AOK[id]}
 /* settings */
 const CITIES=[['القاهرة',30.0444,31.2357],['الإسكندرية',31.2001,29.9187],['أسوان',24.0889,32.8998],['الرياض',24.7136,46.6753],['مكة المكرمة',21.3891,39.8579],['المدينة المنورة',24.5247,39.5692],['جدة',21.4858,39.1925],['دبي',25.2048,55.2708],['الدوحة',25.2854,51.531],['الكويت',29.3759,47.9774],['عمّان',31.9454,35.9284],['بغداد',33.3152,44.3661],['الخرطوم',15.5007,32.5599],['الدار البيضاء',33.5731,-7.5898],['تونس',36.8065,10.1815],['الجزائر',36.7538,3.0588]];
-function vg(){const sg=(a,it,cur)=>`<div class='seg'>`+it.map(i=>`<button data-a='${a}' data-x='${i[0]}' aria-pressed='${cur===i[0]}'>${i[1]}</button>`).join('')+`</div>`,jw='yota';
- const sw=Object.keys(PL).map(k=>{const p=PL[k];return `<button class='swt' data-a='th' data-x='${k}' aria-pressed='${S.th===k}' style='background:linear-gradient(135deg,${p.d[3]},${p.d[0]} 55%,${p.d[1]})'><span>${p.n}</span></button>`}).join('');
- const st=k=>S.pm[k]?'مفعّلة':'طلب الإذن';
- return `<div class='mh'><h2>الإعدادات</h2></div><section class='win'><h2>اللغة</h2>`+sg('lg',[['ar','العربية'],['en','English']],LN)+`</section><section class='win'><h2>الثيم</h2><div class='sws2'>${sw}</div><p class='sl'>الوضع</p>`+sg('md',[['auto','تلقائي'],['light','فاتح'],['dark','داكن']],S.md)+`</section><section class='win'><h2>الخط</h2><div class='seg'>`+FN.map(f=>`<button class='fnt' data-a='fn' data-x='${f[0]}' aria-pressed='${S.fn===f[0]}' style="font-family:'${f[0]}'">${f[1]}</button>`).join('')+`</div></section><section class='win'><h2>عام</h2><button class='row' data-a='vb'><span>الاهتزاز</span><b>${S.v?'شغّال':'مقفول'}</b></button><button class='row' data-a='ploc'><span>السماح بالموقع</span><b>${st('loc')}</b></button><button class='row' data-a='pnote'><span>السماح بالإشعارات والأذان</span><b>${st('note')}</b></button></section><section class='win'><h2>الأذان</h2><button class='row' data-a='ado'><span>تشغيل الأذان عند دخول الوقت</span><b>${S.adOn?'شغّال':'مقفول'}</b></button><div class='stg' style='margin-top:10px'>${AD.map(a=>`<button class='sti' data-a='ads' data-x='${a[0]}' aria-pressed='${S.ad===a[0]}'><span>${a[1]}</span><b data-a='adt' data-x='${a[0]}'>تجربة</b></button>`).join('')}</div><p class='sl'>ملفات الصوت: ارفع على GitHub ملفات باسم adhan-makkah.mp3 وهكذا.</p><p class='sl'>الوقت بين الأذان والإقامة (بالدقائق)</p>`+PR.map(p=>`<div class='row stpr'><span>${p[1]}</span><span class='stp'><button data-a='iqm' data-x='${p[0]}'>−</button><b>${S.iq[p[0]]}</b><button data-a='iqp' data-x='${p[0]}'>+</button></span></div>`).join('')+`</section><section class='win'><h2>الوقت والموقع</h2><p class='sl' style='margin-top:0'>التوقيت</p>`+sg('dst',[['auto','تلقائي'],['sum','التوقيت الصيفي'],['win','التوقيت الشتوي']],S.dst||'auto')+`<p class='sl'>اختيار مدينة</p><select id='cty' class='nm'><option value=''>— اختر —</option>${CITIES.map((c,i)=>`<option value='${i}'>${c[0]}</option>`).join('')}</select></section><section class='win'><h2>التذكيرات</h2><button class='row' data-a='rk'><span>تذكير بورد سورة الكهف يوم الجمعة</span><b>${S.rk?'شغّال':'مقفول'}</b></button><button class='row' data-a='rw'><span>تذكير بورد القرآن اليومي</span><b>${S.rw?'شغّال':'مقفول'}</b></button></section><section class='win'><h2>المصحف</h2><p class='sl' style='margin-top:0'>طريقة تقليب المصحف</p>`+sg('mm',[['v','رأسي'],['h','أفقي']],S.mm||'v')+`<p class='sl'>حمّل المصحف كاملاً مرة واحدة وهو متصل بالإنترنت، ثم اقرأه بدون إنترنت.</p><button class='row' data-a='dq'><span>تحميل المصحف كاملاً</span><b id='dq1'>${DLS.q}</b></button><button class='row' data-a='dtf'><span>تحميل التفسير الميسر</span><b id='dq2'>${DLS.t}</b></button></section>`}
+const SETS=[['lg','اللغة'],['th','الثيم'],['fn','الخط'],['gn','عام'],['ad','الأذان'],['tm','الوقت والموقع'],['rm','التذكيرات'],['mq','المصحف']];
+let SX='';
+function vg(){return `<div class='mh'><h2>الإعدادات</h2></div><section class='win'>`+SETS.map(x=>`<button class='row' data-a='sx' data-x='${x[0]}'><span>${x[1]}</span><b>${LN==='en'?'›':'‹'}</b></button>`).join('')+`</section>`}
+function sxBody(id){const sg=(a,it,cur)=>`<div class='seg'>`+it.map(i=>`<button data-a='${a}' data-x='${i[0]}' aria-pressed='${cur===i[0]}'>${i[1]}</button>`).join('')+`</div>`,st=k=>S.pm[k]?'مفعّلة':'طلب الإذن';
+ if(id==='lg')return sg('lg',[['ar','العربية'],['en','English']],LN);
+ if(id==='th'){const sw=Object.keys(PL).map(k=>{const p=PL[k];return `<button class='swt' data-a='th' data-x='${k}' aria-pressed='${S.th===k}' style='background:linear-gradient(135deg,${p.d[3]},${p.d[0]} 55%,${p.d[1]})'><span>${p.n}</span></button>`}).join('');return `<div class='sws2'>${sw}</div><p class='sl'>الوضع</p>`+sg('md',[['auto','تلقائي'],['light','فاتح'],['dark','داكن']],S.md)}
+ if(id==='fn')return `<div class='seg'>`+FN.map(f=>`<button class='fnt' data-a='fn' data-x='${f[0]}' aria-pressed='${S.fn===f[0]}' style="font-family:'${f[0]}'">${f[1]}</button>`).join('')+`</div>`;
+ if(id==='gn')return `<button class='row' data-a='vb'><span>الاهتزاز</span><b>${S.v?'شغّال':'مقفول'}</b></button><button class='row' data-a='ploc'><span>السماح بالموقع</span><b>${st('loc')}</b></button><button class='row' data-a='pnote'><span>السماح بالإشعارات والأذان</span><b>${st('note')}</b></button>`;
+ if(id==='ad')return `<button class='row' data-a='ado'><span>تشغيل الأذان عند دخول الوقت</span><b>${S.adOn?'شغّال':'مقفول'}</b></button><div class='stg' style='margin-top:10px'>${AD.map(a=>`<button class='sti' data-a='ads' data-x='${a[0]}' aria-pressed='${S.ad===a[0]}'><span>${a[1]}</span><b data-a='adt' data-x='${a[0]}'>تجربة</b></button>`).join('')}</div><p class='sl'>ملفات الصوت: ارفع على GitHub ملفات باسم adhan-makkah.mp3 وهكذا.</p><p class='sl'>الوقت بين الأذان والإقامة (بالدقائق)</p>`+PR.map(p=>`<div class='row stpr'><span>${p[1]}</span><span class='stp'><button data-a='iqm' data-x='${p[0]}'>−</button><b>${S.iq[p[0]]}</b><button data-a='iqp' data-x='${p[0]}'>+</button></span></div>`).join('');
+ if(id==='tm')return `<p class='sl' style='margin-top:0'>التوقيت</p>`+sg('dst',[['auto','تلقائي'],['sum','التوقيت الصيفي'],['win','التوقيت الشتوي']],S.dst||'auto')+`<p class='sl'>اختيار مدينة</p><select id='cty' class='nm'><option value=''>— اختر —</option>${CITIES.map((c,i)=>`<option value='${i}'>${c[0]}</option>`).join('')}</select>`;
+ if(id==='rm')return `<button class='row' data-a='rk'><span>تذكير بورد سورة الكهف يوم الجمعة</span><b>${S.rk?'شغّال':'مقفول'}</b></button><button class='row' data-a='rw'><span>تذكير بورد القرآن اليومي</span><b>${S.rw?'شغّال':'مقفول'}</b></button>`;
+ if(id==='mq')return `<p class='sl' style='margin-top:0'>طريقة تقليب المصحف</p>`+sg('mm',[['v','رأسي'],['h','أفقي']],S.mm||'v')+`<p class='sl'>حمّل المصحف كاملاً مرة واحدة وهو متصل بالإنترنت، ثم اقرأه بدون إنترنت.</p><button class='row' data-a='dq'><span>تحميل المصحف كاملاً</span><b id='dq1'>${DLS.q}</b></button><button class='row' data-a='dtf'><span>تحميل التفسير الميسر</span><b id='dq2'>${DLS.t}</b></button>`;
+ return ''}
+function stRender(id){const t=SETS.find(x=>x[0]===id);if(!t)return;$('sx').innerHTML=`<div class='nfo'><div class='nfi'><div class='nfh'><span class='nfb'>!</span><h2 class='nft'>${t[1]}</h2><button id='sxc' data-a='sxc' aria-label='إغلاق'>×</button></div><div class='sxb'>${sxBody(id)}</div></div></div>`}
+function sxOpen(id){SX=id;stRender(id);$('sx').classList.add('open');$('sxx').classList.add('open')}
+function sxClose(){SX='';$('sx').classList.remove('open');$('sxx').classList.remove('open')}
 const DLS={q:'تحميل',t:'تحميل'};let DLB=false;
 async function dlAll(ed,key,el){if(DLB)return;DLB=true;try{for(let n=1;n<=114;n++){DLS[key]=n+' / 114';const e=$(el);if(e)e.textContent=DLS[key];await qget(API+n+'/'+ed)}DLS[key]='تم التحميل ✓';toast('اكتمل التحميل',1)}catch(e){DLS[key]='تعذّر، حاول لاحقاً';toast('تعذّر التحميل، تأكد من الإنترنت',1)}DLB=false;const e=$(el);if(e)e.textContent=DLS[key]}
 /* notifications panel */
@@ -548,6 +566,7 @@ function ppOpen(){TMP={n:S.u.n,a:S.u.a,f:S.u.f};PE='a';ppRender();$('pp').classL
 function ppClose(){$('pp').classList.remove('open');$('ppx').classList.remove('open');TMP=null}
 function ppKeep(){TMP=TMP||{n:S.u.n,a:S.u.a,f:S.u.f};const i=$('pnm');if(i)TMP.n=i.value}
 $('ppx').onclick=ppClose;
+$('sxx').onclick=sxClose;$('sx').onclick=e=>{if(e.target.closest('#sxc')){sxClose();return}$('v').onclick(e)};
 $('pp').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,x=b.dataset.x;
  if(a==='ppc'){ppClose();return}
  if(a==='pst'){ppClose();goTab('s');return}
@@ -557,18 +576,21 @@ $('pp').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.
  else if(a==='ac'){const n=(TMP.n||'').trim().slice(0,20);S.u={n,a:TMP.a,f:TMP.f};ppClose();toast('تم حفظ الحساب',1);save();render();return}
  ppRender()};
 /* render + events */
-function render(){const v=$('v');v.classList.remove('go');v.innerHTML=({h:vh,z:vz,m:vm,l:vl,s:vst,p:vp,g:vg})[tab]();$('nv').innerHTML=NV.map(n=>`<button data-n='${n[0]}' aria-pressed='${tab===n[0]}'>${ni(n[0])}${n[1]}</button>`).join('');if(tab==='z'&&AC==='ts')upd();hd();LAST=sig();afterR()}
+function render(){const v=$('v');v.classList.remove('go');v.innerHTML=({h:vh,z:vz,m:vm,l:vl,s:vst,p:vp,g:vg})[tab]();$('nv').innerHTML=NV.map(n=>`<button data-n='${n[0]}' aria-pressed='${tab===n[0]}'>${ni(n[0])}${n[1]}</button>`).join('');if(tab==='z'&&AC==='ts')upd();hd();LAST=sig();afterR();if(SX)stRender(SX)}
 function afterR(){if(tab==='m'&&MK&&GOTO&&QD[MK]){const e=document.querySelector("[data-a='bm'][data-x='"+GOTO.a+"']");if(e&&e.scrollIntoView){e.scrollIntoView({block:'center',inline:'center'});GOTO=null}}}
 function goTab(t){tab=t;if(t==='z')AC='';if(t==='m')MK=0;if(t==='l'){LB='';LE=-1}render();const v=$('v');Array.prototype.forEach.call(v.children,(c,i)=>c.style.animationDelay=Math.min(i,8)*45+'ms');v.classList.add('go');window.scrollTo(0,0)}
 function sig(){return PR.map(p=>pst(p[0])[0]).join('')+nxt().k+(iqNow()?'i':'')+(azLock('sb')?'a':'b')+(azLock('ms')?'c':'d')}
 $('nv').onclick=e=>{const b=e.target.closest('[data-n]');if(b)goTab(b.dataset.n)};
 $('hd').onclick=e=>{if(e.target.closest('.bell'))npOpen()};$('npx').onclick=npClose;
 $('np').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='npc')npClose();else if(b.id==='npk'){S.nt=[];save();npRender()}else if(b.id==='npa')askNote()};
-addEventListener('keydown',e=>{if(e.key==='Escape'){npClose();ppClose()}});
+addEventListener('keydown',e=>{if(e.key==='Escape'){npClose();ppClose();sxClose()}});
 $('v').oninput=e=>{if(e.target.id==='sq'){SQ=e.target.value;const g=$('sgl');if(g)g.innerHTML=sgl()}};
+$('sx').onchange=e=>$('v').onchange(e);
 $('v').onchange=e=>{if(e.target.id==='rc'){S.rc=e.target.value;save()}else if(e.target.id==='cty'&&e.target.value!==''){const c=CITIES[+e.target.value];S.loc={la:c[1],lo:c[2],nm:c[0]};save();render();schedN();toast('تم اختيار '+c[0],1)}};
 $('v').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,x=b.dataset.x,zk=zl(AC);
  if(a==='pop'){ppOpen();return}
+ if(a==='sx'){sxOpen(x);return}
+ if(a==='sxc'){sxClose();return}
  if(a==='tap'){const n=(S.c[S.i]||0)+1;S.c[S.i]=n;S.tc++;S.tt++;buzz(n===D[S.i][1]?[60,40,60]:12);upd();check();if(b.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches)b.animate([{transform:'scale(.9)'},{transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.3,1.7,.5,1)'});return}
  if(a==='tb'){goTab(x);return}
  if(a==='loc'||a==='ploc'){askLoc();return}
@@ -614,6 +636,7 @@ function exOpen(){$('ex').innerHTML=`<div class='nfo'><div class='nfi'><div clas
 function exClose(){$('ex').hidden=true}
 function doExit(){const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;exClose();if(A&&A.exitApp){A.exitApp();return}try{window.close()}catch(e){}toast('يمكنك الآن إغلاق الصفحة',1)}
 function onBack(){if(!$('ex').hidden){exClose();return}
+ if(SX){sxClose();return}
  if($('pp').classList.contains('open')){ppClose();return}
  if($('np').classList.contains('open')){npClose();return}
  if(!$('w').hidden){nx();return}
@@ -642,7 +665,7 @@ function applyFont(){document.documentElement.style.setProperty('--fn',"'"+S.fn+
 const EN=[[/^الصورة$/,'Picture'],[/^الإطار$/,'Frame'],[/^الأذان$/,'Adhan'],[/^ظل$/,'Shadow'],[/^ياقوت$/,'Ruby'],[/^توباز$/,'Topaz'],[/^فيروز$/,'Turquoise'],[/^ألماس$/,'Diamond'],
 ['تشغيل الأذان عند دخول الوقت','Play adhan at prayer time'],['السماح بالإشعارات والأذان','Allow notifications and adhan'],['ملف الأذان غير موجود. ارفع','Adhan file not found. Upload'],['ملفات الصوت: ارفع على GitHub ملفات باسم','Audio files: upload to GitHub files named'],['وهكذا.','and so on.'],
 ['أذان المسجد الحرام - مكة','Masjid al-Haram, Makkah'],['أذان المسجد النبوي - المدينة','Prophet’s Mosque, Madinah'],['مشاري العفاسي','Mishary Alafasy'],['ناصر القطامي','Nasser Al-Qatami'],['عبد الباسط عبد الصمد','Abdul Basit Abdul Samad'],['نصر الدين طوبار','Nasr El-Din Tobar'],
-['مهام إضافية (+10 نقاط)','Extra quests (+10 pts)'],[/^نعم$/,'Yes'],['صلاة الصبح (قضاء)','Subh prayer (qada)'],['قضاء · نصف النقاط','Qada · half points'],[/^تأخير$/,'Late'],['تأخير:','Late:'],['10 نقاط','10 pts'],['انتهى الوقت','Time is over'],['خصم 40 نقطة: فاتتك صلاة','−40 points: you missed'],['وقت أذكار الصباح:','Morning azkar time:'],['وقت أذكار المساء:','Evening azkar time:'],[/^لا$/,'No'],[/^الخروج$/,'Exit'],['هل تود الخروج من التطبيق؟','Do you want to exit the app?'],['يمكنك الآن إغلاق الصفحة','You can now close the page'],['لشراء المزيد افتح المتجر','Open the store to buy more'],['تعديل الصورة والإطار','Edit picture and frame'],['نقاط المستوى','Level points'],['آخر عقوبة:','Last penalty:'],['الجواهر:','Gems:'],['جواهرك لا تكفي','Not enough gems'],['جوهرة','gems'],['تعديل الملف الشخصي','Edit profile'],['تجربة','Test'],['حان وقت','Time for'],
+['مهام إضافية (+10 نقاط)','Extra quests (+10 pts)'],[/^نعم$/,'Yes'],['الوقت والموقع','Time and location'],['التذكيرات','Reminders'],['صلاة الصبح (قضاء)','Subh prayer (qada)'],['قضاء · نصف النقاط','Qada · half points'],[/^تأخير$/,'Late'],['تأخير:','Late:'],['10 نقاط','10 pts'],['انتهى الوقت','Time is over'],['خصم 40 نقطة: فاتتك صلاة','−40 points: you missed'],['وقت أذكار الصباح:','Morning azkar time:'],['وقت أذكار المساء:','Evening azkar time:'],[/^لا$/,'No'],[/^الخروج$/,'Exit'],['هل تود الخروج من التطبيق؟','Do you want to exit the app?'],['يمكنك الآن إغلاق الصفحة','You can now close the page'],['لشراء المزيد افتح المتجر','Open the store to buy more'],['تعديل الصورة والإطار','Edit picture and frame'],['نقاط المستوى','Level points'],['آخر عقوبة:','Last penalty:'],['الجواهر:','Gems:'],['جواهرك لا تكفي','Not enough gems'],['جوهرة','gems'],['تعديل الملف الشخصي','Edit profile'],['تجربة','Test'],['حان وقت','Time for'],
 [/^تم$/,'Done'],[/^ابدأ$/,'Start'],[/^فتح$/,'Open'],[/^حفظ$/,'Save'],[/^عام$/,'General'],[/^تحميل$/,'Download'],[/^استماع$/,'Listen'],[/^الصلاة$/,'Prayer'],
 ['اكتملت مهام اليوم، استمر يا مسلم','Today’s quests complete. Keep going, Muslim.'],
 ['التسجيل يفتح بعد 10 دقائق من الإقامة ولك مهلة 15 دقيقة وإلا حُسب تأخيراً. وبعد أذان الصلاة التالية تنال 10 نقاط فقط، ويُخصم 40 نقطة عند الفوات. أذكار الصباح والمساء تُسجَّل تلقائياً بعد 5 دقائق من القراءة داخل وقتها.','Logging opens 10 minutes after iqama with a 15-minute grace, otherwise it counts as late. After the next adhan you get only 10 points and 40 are deducted. Morning and evening azkar are logged automatically after 5 minutes of reading within their window.'],
