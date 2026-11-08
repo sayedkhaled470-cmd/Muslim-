@@ -55,6 +55,30 @@ jobs:
           printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">مسلم</string>\n    <string name="title_activity_main">مسلم</string>\n</resources>\n' > $R/values-ar/strings.xml
           M=android/app/src/main/AndroidManifest.xml
           sed -i 's#</manifest>#<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/><uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/><uses-permission android:name="android.permission.POST_NOTIFICATIONS"/><uses-permission android:name="android.permission.USE_EXACT_ALARM"/><uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/><uses-permission android:name="android.permission.VIBRATE"/></manifest>#' $M
+      - name: Signing and version
+        run: |
+          python3 - <<'PY'
+          import re
+          p='android/app/build.gradle'
+          s=open(p).read()
+          blk='''signingConfigs {
+              muslim {
+                  storeFile file("$rootDir/../muslim.keystore")
+                  storePassword "muslim123"
+                  keyAlias "muslim"
+                  keyPassword "muslim123"
+              }
+          }
+          buildTypes {
+              debug {
+                  signingConfig signingConfigs.muslim
+              }'''
+          s=re.sub(r'(?m)^[ \t]*buildTypes\s*\{',lambda m:blk,s,count=1)
+          assert 'signingConfigs.muslim' in s
+          open(p,'w').write(s)
+          PY
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          grep -n "versionCode\|signingConfig" android/app/build.gradle
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
