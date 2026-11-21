@@ -1,64 +1,27 @@
-name: Build APK
-on:
-  workflow_dispatch:
-  push:
-    branches: [main, master]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-      - name: Prepare web files
-        run: |
-          mkdir -p www/adhan
-          cp index.html www/index.html
-          for f in adhan-*.mp3; do
-            [ -e "$f" ] || continue
-            cp "$f" "www/adhan/${f#adhan-}"
-          done
-      - run: npm install
-      - run: npx cap add android
-      - name: Android setup
-        run: |
-          pip install pillow
-          python3 - <<'PY'
-          import os
-          from PIL import Image
-          r='android/app/src/main/res/mipmap-'
-          for d,a,f in [('mdpi',48,108),('hdpi',72,162),('xhdpi',96,216),('xxhdpi',144,324),('xxxhdpi',192,432)]:
-              for n,s,src in [('ic_launcher.png',a,'icon.png'),('ic_launcher_round.png',a,'icon.png'),('ic_launcher_foreground.png',f,'icon-fg.png')]:
-                  p=r+d+'/'+n
-                  if os.path.exists(p): Image.open(src).convert('RGBA').resize((s,s)).save(p)
-          import glob
-          from PIL import ImageOps
-          sp=Image.open('splash.png').convert('RGB')
-          for q in glob.glob('android/app/src/main/res/drawable*/splash.png'):
-              w,h=Image.open(q).size
-              ImageOps.fit(sp,(w,h),Image.LANCZOS).save(q)
-          open('android/app/src/main/res/values/ic_launcher_background.xml','w').write('<?xml version="1.0" encoding="utf-8"?><resources><color name="ic_launcher_background">#0b3a47</color></resources>')
-          PY
-          R=android/app/src/main/res
-          mkdir -p $R/raw $R/values-ar
-          for f in adhan-*.mp3; do
-            [ -e "$f" ] || continue
-            n=${f#adhan-}
-            cp "$f" "$R/raw/adhan_${n//-/_}"
-          done
-          sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Muslim</string>#; s#<string name="title_activity_main">[^<]*</string>#<string name="title_activity_main">Muslim</string>#' $R/values/strings.xml
-          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">مسلم</string>\n    <string name="title_activity_main">مسلم</string>\n</resources>\n' > $R/values-ar/strings.xml
-          M=android/app/src/main/AndroidManifest.xml
-          sed -i 's#</manifest>#<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/><uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/><uses-permission android:name="android.permission.POST_NOTIFICATIONS"/><uses-permission android:name="android.permission.USE_EXACT_ALARM"/><uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/><uses-permission android:name="android.permission.VIBRATE"/></manifest>#' $M
-      - run: npx cap sync android
-      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: muslim-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          
+تحديث تطبيق مسلم على GitHub (ليتثبّت فوق النسخة الموجودة)
+
+1) على GitHub: Add file > Upload files، وارفع هذه الملفات (تحل محل القديمة):
+   index.html  package.json  capacitor.config.json  icon.png  icon-fg.png  splash.png  muslim.keystore
+2) افتح .github/workflows/build-apk.yml واستبدل محتواه بالكود الكامل (في الرسالة أو في ملف build-apk.yml)، ثم Commit.
+3) تبويب Actions > Build APK > Run workflow، ثم نزّل muslim-apk من Artifacts.
+
+مهم: أول مرة فقط لازم تحذف النسخة القديمة من الموبايل وتثبّت الجديدة (لأن مفتاح التوقيع اتغيّر).
+من بعدها كل تحديث بيتثبّت فوق القديم من غير حذف وبنفس البيانات.
+اجعل الـ Repository خاص (Private) لأن مفتاح التوقيع موجود فيه.
+
+--- تحديثات ---
+- المصحف والتفسير والخطوط بيتحمّلوا وقت البناء داخل الـ APK (ملفات tools/fetch_quran.py و tools/fetch_fonts.py).
+- لو عايز أذان بصوت معيّن: ارفع ملفات باسم adhan-makkah.mp3 وهكذا في أول المشروع.
+- المكتبة: الكتب الأربعة (fq=الفقه، rs=رياض الصالحين، an=قصص الأنبياء، sr=السيرة) مابقتش داخل الـ APK. المستخدم بيضغط "تحميل" على الكتاب جوه التطبيق فينزل ويتخزن على الموبايل (وفيه زر حذف لتوفير المساحة).
+  لازم ترفع مجلد books (الموجود في muslim-books.zip) على Repository جديد اسمه muslim-books ويكون Public (الفرع main)، والتطبيق بيجيب الكتب من:
+  https://raw.githubusercontent.com/<اسم حسابك>/muslim-books/main/books/an.pdf  وهكذا. لا تغيّر أسماء الملفات.
+  لو حابب مكان تاني: في GitHub > Settings > Secrets and variables > Actions > Variables ضيف BOOKS_BASE_URL برابط المجلد (ينتهي بـ /).
+- الضغطة المطوّلة على الآية في المصحف أو على صفحة الكتاب تفتح لوحة تنبثق من مكان الضغط.
+
+
+== تحديث v13 ==
+- المستويات: F/1000 ثم E/2000 D/4000 C/8000 B/16000 A/32000 S/64000 نقطة، وجواهر الإتمام 10/20/40/80/160/320/640. خصم الصلاة الفائتة يزيد مع المستوى: 40/80/160/320/640/1280/2560.
+- الصفحة الرئيسية وصفحة الأذكار بتصميم جديد، ولوحة الإشعارات بشكل نافذة النظام.
+- الضغطة المطوّلة على الآية في المصحف تفتح قائمة (استماع، تفسير، حفظ، نسخ، مشاركة، ملاحظة) وكل اختيار يفتح لوحته.
+- حفظ التقدم: النسخ الاحتياطي التلقائي لأندرويد مفعّل في البناء، وفي الإعدادات > النسخ الاحتياطي حفظ/استرجاع يدوي بملف أو كود.
+- الشاشة متجاوبة (موبايل، تابلت، آيباد، لابتوب).
